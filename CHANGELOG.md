@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0
+
+- Icono del marketplace regenerado desde `media/icon.svg` (el anterior estaba malformado); nueva tarea `npm run icon` con `@resvg/resvg-js` para reproducirlo.
+- Pruebas de integración con servidor Zen simulado (MockZen) y sonda de herramientas del lane.
+- Empaquetado publicado como release con el `.vsix` adjunto.
+
 ## 0.1.0
 
 - Proveedor `LanguageModelChatProvider` («OpenCode Free») con los modelos gratuitos del lane anónimo de OpenCode Zen en el selector de modelos del chat de VS Code.
