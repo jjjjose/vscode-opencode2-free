@@ -1,0 +1,117 @@
+{
+  "name": "opencode-free",
+  "displayName": "OpenCode Free Chat",
+  "description": "Modelos gratis de OpenCode Zen en el selector de chat de VS Code (lane anónimo, sin API key).",
+  "version": "0.3.1",
+  "publisher": "local",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "engines": {
+    "vscode": "^1.106.0"
+  },
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "keywords": [
+    "opencode",
+    "zen",
+    "free",
+    "chat",
+    "language model",
+    "bring your own model",
+    "byok"
+  ],
+  "main": "./out/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "vendor": "opencode-free",
+        "displayName": "OpenCode Free",
+        "managementCommand": "opencode-free.manage"
+      }
+    ],
+    "commands": [
+      {
+        "command": "opencode-free.manage",
+        "title": "OpenCode Free: Gestionar"
+      },
+      {
+        "command": "opencode-free.refreshModels",
+        "title": "OpenCode Free: Actualizar modelos"
+      },
+      {
+        "command": "opencode-free.showDiagnostics",
+        "title": "OpenCode Free: Mostrar diagnóstico"
+      },
+      {
+        "command": "opencode-free.agentNoResponse",
+        "title": "OpenCode Free: El agente no responde"
+      },
+      {
+        "command": "opencode-free.showLogs",
+        "title": "OpenCode Free: Mostrar registros"
+      }
+    ],
+    "configuration": {
+      "title": "OpenCode Free",
+      "properties": {
+        "opencode-free.catalog.refreshMinutes": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 240,
+          "markdownDescription": "Cada cuántos minutos se refresca el catálogo de modelos gratuitos de OpenCode Zen.",
+          "description": "Intervalo de refresco del catálogo de modelos (minutos)."
+        },
+        "opencode-free.request.firstEventTimeoutSeconds": {
+          "type": "number",
+          "default": 30,
+          "minimum": 5,
+          "maximum": 600,
+          "description": "Segundos de espera hasta el primer evento del stream antes de abortar la petición."
+        },
+        "opencode-free.request.idleTimeoutSeconds": {
+          "type": "number",
+          "default": 120,
+          "minimum": 10,
+          "maximum": 600,
+          "description": "Segundos de inactividad del stream (sin eventos) antes de abortar la petición."
+        },
+        "opencode-free.request.maxRetries": {
+          "type": "number",
+          "default": 3,
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Reintentos silenciosos ante errores transitorios (429/caídas) antes de la primera respuesta."
+        },
+        "opencode-free.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Registros detallados en el canal de salida «OpenCode Free»."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "package": "vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.106.0",
+    "@vscode/vsce": "^3.6.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.2.0"
+  }
+}
