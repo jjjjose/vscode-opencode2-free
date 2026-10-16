@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Variantes de razonamiento dinámicas: los niveles de esfuerzo publicados por el catálogo (`reasoning_options`) aparecen en el selector como `Modelo (low)`, `Modelo (max)`, etc.; la variante elegida envía `reasoning_effort` al lane y la entrada sin sufijo conserva el comportamiento predeterminado. Sin listas fijas: cada refresco añade o retira variantes automáticamente.
+- Selección de modelos robusta: identificadores locales opacos (nunca viajan como IDs de modelo) resueltos contra el catálogo vigente en cada petición; si la variante elegida desaparece tras un refresco, la extensión pide escoger otra antes de enviar.
+- README reescrito en inglés (`README.md`), con versiones en español (`README.es.md`) y chino (`README.zh.md`).
+
 ## 1.0.0
 
 - Icono del marketplace regenerado desde `media/icon.svg` (el anterior estaba malformado); nueva tarea `npm run icon` con `@resvg/resvg-js` para reproducirlo.

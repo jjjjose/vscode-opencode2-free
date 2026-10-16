@@ -2,9 +2,13 @@
   "name": "opencode-free",
   "displayName": "OpenCode Free Chat",
   "description": "Modelos gratis de OpenCode Zen en el selector de chat de VS Code (lane anónimo, sin API key).",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "local",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jjjjose/vscode-opencode2-free.git"
+  },
   "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.106.0"

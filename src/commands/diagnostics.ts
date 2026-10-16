@@ -17,7 +17,7 @@ export function registerDiagnosticsCommand(
     const config = vscode.workspace.getConfiguration('opencode-free');
     const lines: string[] = [];
     lines.push('=== OpenCode Free · diagnóstico ===');
-    lines.push(`extensión:      ${vscode.extensions.getExtension('local.opencode-free')?.packageJSON?.version ?? '0.3.1'}`);
+    lines.push(`extensión:      ${vscode.extensions.getExtension('local.opencode-free')?.packageJSON?.version ?? '1.1.0'}`);
     lines.push(`vscode:         ${vscode.version}`);
     lines.push(`catálogo:       ${snapshot.status} · ${snapshot.exposed} expuestos / ${snapshot.total} total`);
     lines.push(`último refresco:${snapshot.lastRefresh !== undefined ? ` ${snapshot.lastRefresh}` : ' aún pendiente'}`);
