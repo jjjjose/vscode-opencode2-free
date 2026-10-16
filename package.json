@@ -105,9 +105,11 @@
     "watch": "tsc -watch -p ./",
     "test": "vitest run",
     "test:watch": "vitest",
+    "icon": "node scripts/gen-icon.mjs",
     "package": "vsce package --allow-missing-repository"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^20.14.0",
     "@types/vscode": "^1.106.0",
     "@vscode/vsce": "^3.6.0",
