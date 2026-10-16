@@ -24,6 +24,12 @@ Chat de VS Code ──▶ LanguageModelChatProvider ──▶ cliente Zen (strea
 
 No hace falta configurar nada. El catálogo se refresca solo cada 5 minutos. El uso que devuelve el lane (tokens de entrada, salida y caché) se reporta al chat, de modo que el medidor de contexto y la compactación funcionan también con estos modelos.
 
+### Variantes de razonamiento
+
+Cuando el catálogo declara niveles de razonamiento, el selector muestra entradas como `Modelo (low)` o `Modelo (max)`. Elige una para enviar ese nivel; la entrada sin sufijo conserva el comportamiento predeterminado del proveedor. Los nombres y niveles se obtienen dinámicamente de los metadatos de OpenCode/models.dev, sin listas fijas ni niveles inventados para modelos que no los declaran.
+
+Cada refresco añade o retira variantes automáticamente. Puedes forzarlo con **OpenCode Free: Actualizar modelos**. Ante un fallo de red se conserva la última caché válida. Si la variante seleccionada desaparece tras un refresco correcto, la extensión te pedirá elegir otra antes de enviar la petición.
+
 ### Sesiones de agente (Copilot CLI)
 
 Las sesiones de agente no usan directamente los proveedores de la ventana donde escribes: el host de agentes publica los modelos BYOK de **una única ventana servidora** (la primera con modelos disponibles). Por eso, para ver «OpenCode Free» en el selector de las sesiones de agente:

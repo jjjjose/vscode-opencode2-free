@@ -24,6 +24,12 @@ VS Code chat ──▶ LanguageModelChatProvider ──▶ Zen client (streaming
 
 There is nothing to configure. The catalog refreshes itself every 5 minutes. The usage reported by the lane (input, output and cache tokens) is forwarded to the chat, so the context meter and auto-compaction work with these models too.
 
+### Reasoning variants
+
+When the catalog declares reasoning levels, the picker includes entries such as `Model (low)` or `Model (max)`. Select one to send that level; the entry without a suffix uses the provider default. Names and levels come dynamically from OpenCode/models.dev metadata, with no fixed list or invented levels for models that do not declare them.
+
+Each refresh automatically adds or removes variants. Use **OpenCode Free: Actualizar modelos** to refresh immediately. Network failures retain the last valid cache. If a selected variant disappears after a successful refresh, the extension asks you to choose another before sending the request.
+
 ### Agent sessions (Copilot CLI)
 
 Agent sessions do not use the providers of the window you type in directly: the agent host publishes the BYOK models of a **single serving window** (the first one with available models). That is why, to see "OpenCode Free" in the agent session picker:

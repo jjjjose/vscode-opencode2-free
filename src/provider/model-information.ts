@@ -1,6 +1,7 @@
 import type * as vscode from 'vscode';
 
 import type { ModelCatalog } from '../zen/catalog';
+import { modelSelections } from './model-variants';
 
 /**
  * Construcción de la información de modelos que VS Code muestra en el
@@ -67,11 +68,13 @@ export function formatContextSize(tokens: number): string {
 
 export function buildModelInformation(catalog: ModelCatalog): vscode.LanguageModelChatInformation[] {
   const models: vscode.LanguageModelChatInformation[] = [];
-  for (const id of catalog.list()) {
+  for (const selection of modelSelections(catalog)) {
+    const { modelId: id, effort } = selection;
     const limits = catalog.limits(id);
     const metadata = catalog.metadata(id);
     const { contextWindow, maxInput, maxOutput, estimated } = publishedWindows(limits);
     const name = metadata?.name ?? id;
+    const displayName = metadata?.variant && !name.includes(metadata.variant) ? `${name} (${metadata.variant})` : name;
     const toolCalling = metadata?.toolCalling === true;
     const agentWide = toolCalling && contextWindow >= AGENT_COMFORTABLE_CONTEXT;
     const agentRisky = toolCalling && !agentWide;
@@ -85,11 +88,11 @@ export function buildModelInformation(catalog: ModelCatalog): vscode.LanguageMod
         ? ' Sesiones de agente: con muchas herramientas/MCP el contexto estático (prompt de sistema + definiciones) puede superar esta ventana y el host bloquea el turno antes de llamar al proveedor («No response was returned»). Alternativas: un modelo de 1M de este grupo o desactivar MCP/herramientas en la sesión (comando «OpenCode Free: El agente no responde»).'
         : '';
     models.push({
-      id,
-      name: metadata?.variant && !name.includes(metadata.variant) ? `${name} (${metadata.variant})` : name,
+      id: selection.id,
+      name: effort === undefined ? displayName : `${displayName} (${effort})`,
       family: metadata?.family ?? id,
       version: metadata?.version ?? '',
-      detail,
+      detail: effort === undefined ? detail : `${effort} · ${detail}`,
       tooltip: `OpenCode Zen · contexto ${contextWindow.toLocaleString('es')} · entrada ${maxInput.toLocaleString('es')} · salida ${maxOutput.toLocaleString('es')} tokens. Fuente: ${catalog.source(id)}. ${estimated ? 'Límites parcialmente estimados (respaldo conservador).' : ''}${!validLimit(limits?.maxInput) ? ' Entrada derivada de la ventana de contexto.' : ''}${agentNote}`,
       maxInputTokens: maxInput,
       maxOutputTokens: maxOutput,

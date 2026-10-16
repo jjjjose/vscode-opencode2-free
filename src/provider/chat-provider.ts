@@ -12,6 +12,7 @@ import { convertMessages } from './message-converter';
 import { aggregateStream } from './response-aggregator';
 import { countTokensForMessage, countTokensForText } from './token-counter';
 import { toUsagePayload } from './usage';
+import { resolveModelSelection } from './model-variants';
 
 /**
  * Proveedor de modelos OpenCode Free para el selector de chat de VS Code.
@@ -93,8 +94,9 @@ export class OpenCodeFreeChatProvider implements vscode.LanguageModelChatProvide
   ): Promise<void> {
     if (token.isCancellationRequested) return;
 
-    const supportsImages = model.capabilities?.imageInput === true || isVisionModel(model.id, this.#catalog.modalities(model.id));
-    const conversation = convertMessages(messages, { modelId: model.id, supportsImages });
+    const selection = resolveModelSelection(this.#catalog, model.id);
+    const supportsImages = isVisionModel(selection.modelId, this.#catalog.modalities(selection.modelId));
+    const conversation = convertMessages(messages, { modelId: selection.modelId, supportsImages });
 
     if (conversation.messages.length === 0) {
       throw new Error('OpenCode Free: no hay mensajes que enviar.');
@@ -111,7 +113,8 @@ export class OpenCodeFreeChatProvider implements vscode.LanguageModelChatProvide
 
     const requestId = randomUUID();
     const body = buildChatBody({
-      model: model.id,
+      model: selection.modelId,
+      reasoningEffort: selection.effort,
       ...(conversation.system !== undefined ? { system: conversation.system } : {}),
       messages: conversation.messages,
       tools: declaredTools,
@@ -142,7 +145,7 @@ export class OpenCodeFreeChatProvider implements vscode.LanguageModelChatProvide
 
     try {
       this.#log.info(
-        `[${requestId}] petición → proveedor=opencode-free modelo=${model.id} mensajes=${conversation.messages.length} herramientas=${declaredTools.length}`,
+        `[${requestId}] petición → proveedor=opencode-free modelo=${selection.modelId} variante=${selection.effort ?? 'predeterminada'} mensajes=${conversation.messages.length} herramientas=${declaredTools.length}`,
       );
       this.#log.debug(`[${requestId}] estructura=${JSON.stringify(messages.map(message => ({
         role: message.role,

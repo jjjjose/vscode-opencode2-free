@@ -156,7 +156,7 @@ function decodeEffortValues(raw: unknown): { effortValues?: string[] } {
     const entry = option as { type?: unknown; values?: unknown };
     if (entry.type !== 'effort' || !Array.isArray(entry.values)) continue;
     for (const value of entry.values) {
-      if (typeof value === 'string' && value.length > 0 && !values.includes(value)) values.push(value);
+      if (typeof value === 'string' && value.trim().length > 0 && !values.includes(value)) values.push(value);
     }
   }
   return values.length > 0 ? { effortValues: values } : { effortValues: [] };
@@ -492,7 +492,7 @@ export async function fetchZenModels(
     throw new Error('El catálogo de modelos tiene un formato inválido');
   }
   const models: string[] = [];
-  const enriched = payload.data.filter(item => Object.keys(item).some(key => ['limit', 'cost', 'name', 'modalities', 'tool_call', 'provider'].includes(key)));
+  const enriched = payload.data.filter(item => Object.keys(item).some(key => ['limit', 'cost', 'name', 'modalities', 'tool_call', 'provider', 'reasoning', 'reasoning_options'].includes(key)));
   onMetadata?.(decodeModelsDev({ opencode: { models: Object.fromEntries(enriched.map(item => [item.id, item])) } }));
   for (const item of payload.data ?? []) {
     if (typeof item?.id === 'string' && item.id.length > 0) models.push(item.id);

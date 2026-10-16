@@ -58,6 +58,8 @@ export type WireMessage =
 
 export interface ChatBodyInput {
   model: string;
+  /** Nivel publicado por el catálogo; se omite para la variante predeterminada. */
+  reasoningEffort?: string;
   system?: string;
   messages: WireMessage[];
   /** Herramientas declaradas por el cliente (VS Code). */
@@ -137,6 +139,7 @@ export function buildChatBody(input: ChatBodyInput): Record<string, unknown> {
 
   return {
     model: input.model,
+    ...(input.reasoningEffort !== undefined ? { reasoning_effort: input.reasoningEffort } : {}),
     stream: true,
     stream_options: { include_usage: true },
     messages,

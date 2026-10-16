@@ -36,6 +36,7 @@ interface FetchCall {
 let calls: FetchCall[] = [];
 let chatQueue: Array<() => Response> = [];
 let tempDir: string;
+let effortValues: string[] | undefined;
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -101,7 +102,12 @@ function installFetch(): void {
       return json({ object: 'list', data: liveModels.map((id) => ({ id, object: 'model' })) });
     }
     if (url.includes('models.dev') || url.includes('/api.json')) {
-      return json(metadata);
+      return json({ opencode: { models: {
+        ...metadata.opencode.models,
+        'big-pickle': { ...metadata.opencode.models['big-pickle'],
+          ...(effortValues === undefined ? {} : { reasoning: true, reasoning_options: [{ type: 'effort', values: effortValues }] }),
+        },
+      } } });
     }
     if (url.includes('/v1/chat/completions')) {
       const next = chatQueue.shift();
@@ -151,6 +157,7 @@ describe('integración de la extensión (activate + proveedor)', () => {
     informationMessages.length = 0;
     warningMessages.length = 0;
     calls = [];
+    effortValues = undefined;
     chatQueue = [];
     configuration.values = {};
     tempDir = await mkdtemp(join(tmpdir(), 'openoc-free-integration-'));
@@ -247,11 +254,43 @@ describe('integración de la extensión (activate + proveedor)', () => {
       messages: Array<{ role: string; content: unknown }>;
     };
     expect(body.stream).toBe(true);
+    expect(body).not.toHaveProperty('reasoning_effort');
     expect(body.tool_choice).toBe('none');
     const toolNames = body.tools.map((tool) => tool.function.name);
     expect(toolNames).toContain('bash');
     expect(toolNames).toContain('read');
     expect(body.messages[0]).toEqual({ role: 'user', content: 'saluda' });
+  });
+
+  it('envía niveles dinámicos al modelo real y retira variantes al refrescar', async () => {
+    effortValues = ['low', 'nivel-futuro'];
+    const { provider, fired } = await activateExtension();
+    await waitFor(() => fired() >= 1);
+    const models = await liveModelsOf(provider);
+    const variants = models.filter(model => model.id.startsWith('opencode-free:variant:'));
+    expect(variants).toHaveLength(2);
+    for (const [index, variant] of variants.entries()) {
+      await provider.provideLanguageModelChatResponse(variant,
+        [{ role: 1, content: [new LanguageModelTextPart('hola')] }],
+        { tools: [], toolMode: LanguageModelChatToolMode.Auto }, { report: () => {} }, token);
+      const chatCall = calls.filter(call => call.url.includes('/v1/chat/completions')).at(-1)!;
+      expect(JSON.parse(String(chatCall.init?.body))).toMatchObject({
+        model: 'big-pickle', reasoning_effort: effortValues[index],
+      });
+    }
+    const previousEvents = fired();
+    effortValues = ['nivel-futuro', 'nuevo-nivel'];
+    await commands.executeCommand('opencode-free.refreshModels');
+    expect(fired()).toBeGreaterThan(previousEvents);
+    const updated = await liveModelsOf(provider);
+    expect(updated.some(model => model.id === variants[0].id)).toBe(false);
+    expect(updated.some(model => model.id === variants[1].id)).toBe(true);
+    const requests = calls.filter(call => call.url.includes('/v1/chat/completions')).length;
+    await expect(provider.provideLanguageModelChatResponse(variants[0],
+      [{ role: 1, content: [new LanguageModelTextPart('hola')] }],
+      { tools: [], toolMode: LanguageModelChatToolMode.Auto }, { report: () => {} }, token,
+    )).rejects.toThrow('Selecciona otra opción');
+    expect(calls.filter(call => call.url.includes('/v1/chat/completions'))).toHaveLength(requests);
   });
 
   it('reenvía las llamadas a herramientas de VS Code y descarta nombres no declarados', async () => {
