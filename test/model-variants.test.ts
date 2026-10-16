@@ -63,6 +63,6 @@ describe('variantes dinámicas', () => {
       values = ['future'];
       await restored.refreshOnce();
       expect(modelSelections(restored).map(model => model.effort)).toEqual([undefined, 'future']);
-    } finally { await rm(directory, { recursive: true, force: true }); }
+    } finally { await rm(directory, { recursive: true, force: true, maxRetries: 10, retryDelay: 25 }); }
   });
 });

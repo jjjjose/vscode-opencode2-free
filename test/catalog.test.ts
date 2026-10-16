@@ -95,7 +95,7 @@ describe('ModelCatalog', () => {
 
   afterEach(async () => {
     await Promise.all(servers.splice(0).map((server) => server.stop().catch(() => {})));
-    await Promise.all(dirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
+    await Promise.all(dirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 25 })));
   });
 
   async function makeCatalog(options: { chatModels?: string[]; metadata?: Record<string, unknown> } = {}) {

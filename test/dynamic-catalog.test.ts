@@ -19,7 +19,7 @@ describe('catálogo dinámico y límites publicados', () => {
       expect(offline.list()).toEqual(['a-free']);
       expect(buildModelInformation(offline)[0]).toMatchObject({ name: 'Modelo en caché', maxInputTokens: 160000 });
       expect(offline.snapshot().status).toBe('stale');
-    } finally { await rm(directory, { recursive: true, force: true }); }
+    } finally { await rm(directory, { recursive: true, force: true, maxRetries: 10, retryDelay: 25 }); }
   });
 
   it('el timeout aborta fetch y también limita un cuerpo que no termina', async () => {

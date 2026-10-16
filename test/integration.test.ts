@@ -173,7 +173,7 @@ describe('integración de la extensión (activate + proveedor)', () => {
         // los dobles no lanzan; por robustez
       }
     }
-    await rm(tempDir, { recursive: true, force: true });
+    await rm(tempDir, { recursive: true, force: true, maxRetries: 10, retryDelay: 25 });
   });
 
   async function activateExtension(): Promise<{ provider: ProviderLike; fired: () => number }> {
